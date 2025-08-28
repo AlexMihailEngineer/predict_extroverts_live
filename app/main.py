@@ -41,26 +41,6 @@ class ModelInput(BaseModel):
         }
 
 
-# model_values  = {"Time_spent_Alone": 0.0,
-#             "Stage_fear": "No",
-#             "Social_event_attendance": 6.0,
-#             "Going_outside": 4.0,
-#             "Drained_after_socializing": "No",
-#             "Friends_circle_size": 15.0,
-#             "Post_frequency": 5.0
-#         }
-    # curl -X POST "http://localhost:8000/predict" \
-    #         -H "Content-Type: application/json" \
-    #         -d '{
-    #             "Time_spent_Alone": 0.0,
-    #             "Stage_fear": "No",
-    #             "Social_event_attendance": 6.0,
-    #             "Going_outside": 4.0,
-    #             "Drained_after_socializing": "No",
-    #             "Friends_circle_size": 15.0,
-    #             "Post_frequency": 5.0
-    #         }'
-
 
 @app.post('/predict')
 def predict_personality(input_data: ModelInput):
@@ -100,8 +80,3 @@ def predict_personality(input_data: ModelInput):
     personality = 'Extrovert' if pred == 1 else 'Introvert'
 
     return {'Personality': personality}
-
-# modelInput = ModelInput(**model_values) 
-# print(modelInput)
-# print(predict_personality(modelInput))
-# predict_personality
