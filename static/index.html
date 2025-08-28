@@ -19,20 +19,40 @@
             ring: 2px;
             ring-color: #10b981;
         }
+        /* Polished dropdown styling */
+        #languageSelector {
+            transition: all 0.2s ease-in-out;
+            background-color: #f9fafb;
+        }
+        #languageSelector:hover {
+            background-color: #e5e7eb;
+            border-color: #10b981;
+        }
+        #languageSelector:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-6">
     <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 sm:p-8">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 text-center">
+        <div class="flex justify-end mb-4">
+            <select id="languageSelector" class="rounded-lg border border-gray-300 p-2.5 text-sm font-medium text-gray-800 bg-gray-50 focus:ring-2 focus:ring-emerald-500 shadow-sm appearance-none cursor-pointer">
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+                <option value="ro">Română</option>
+            </select>
+        </div>
+        <h1 id="title" class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 text-center">
             Personality Prediction
         </h1>
-        <p class="text-gray-600 text-center mb-6">
+        <p id="description" class="text-gray-600 text-center mb-6">
             Discover if you're an Extrovert or Introvert by answering a few questions.
         </p>
         
         <form id="predictionForm" class="space-y-4">
             <div>
-                <label for="time_spent_alone" class="block text-sm font-medium text-gray-700">
+                <label for="time_spent_alone" id="label_time_spent_alone" class="block text-sm font-medium text-gray-700">
                     Time spent alone (hours/day)
                 </label>
                 <input type="number" id="time_spent_alone" name="time_spent_alone" min="0" max="11" required
@@ -40,7 +60,7 @@
             </div>
             
             <div>
-                <label for="stage_fear" class="block text-sm font-medium text-gray-700">
+                <label for="stage_fear" id="label_stage_fear" class="block text-sm font-medium text-gray-700">
                     Do you have stage fear?
                 </label>
                 <select name="stage_fear" id="stage_fear" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
@@ -50,7 +70,7 @@
             </div>
             
             <div>
-                <label for="social_event_attendance" class="block text-sm font-medium text-gray-700">
+                <label for="social_event_attendance" id="label_social_event_attendance" class="block text-sm font-medium text-gray-700">
                     Social events attended (per month)
                 </label>
                 <input type="number" id="social_event_attendance" name="social_event_attendance" min="0" max="10" required
@@ -58,7 +78,7 @@
             </div>
 
             <div>
-                <label for="going_outside" class="block text-sm font-medium text-gray-700">
+                <label for="going_outside" id="label_going_outside" class="block text-sm font-medium text-gray-700">
                     Days going outside (per week)
                 </label>
                 <input type="number" id="going_outside" name="going_outside" min="0" max="7" required
@@ -66,10 +86,10 @@
             </div>
 
             <div>
-                <label for="drained after socializing" class="block text-sm font-medium text-gray-700">
+                <label for="drained_after_socializing" id="label_drained_after_socializing" class="block text-sm font-medium text-gray-700">
                     Feel drained after socializing?
                 </label>
-                <select name="drained after socializing" id="drained after socializing"
+                <select name="drained_after_socializing" id="drained_after_socializing"
                     class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
@@ -77,7 +97,7 @@
             </div>
 
             <div>
-                <label for="friends_circle_size" class="block text-sm font-medium text-gray-700">
+                <label for="friends_circle_size" id="label_friends_circle_size" class="block text-sm font-medium text-gray-700">
                     Close friends circle size
                 </label>
                 <input type="number" id="friends_circle_size" name="friends_circle_size" min="0" max="15" required
@@ -85,14 +105,14 @@
             </div>
             
             <div>
-                <label for="post_frequency" class="block text-sm font-medium text-gray-700">
+                <label for="post_frequency" id="label_post_frequency" class="block text-sm font-medium text-gray-700">
                     Social media posts (per week)
                 </label>
                 <input type="number" id="post_frequency" name="post_frequency" min="0" max="10" required
                     class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
             </div>
             
-            <button type="submit"
+            <button type="submit" id="submit_button"
                 class="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg gradient-hover">
                 Predict Personality
             </button>
@@ -102,8 +122,95 @@
     </div>
 
     <script>
+        const translations = {
+            en: {
+                title: "Personality Prediction",
+                description: "Discover if you're an Extrovert or Introvert by answering a few questions.",
+                label_time_spent_alone: "Time spent alone (hours/day)",
+                label_stage_fear: "Do you have stage fear?",
+                label_social_event_attendance: "Social events attended (per month)",
+                label_going_outside: "Days going outside (per week)",
+                label_drained_after_socializing: "Feel drained after socializing?",
+                label_friends_circle_size: "Close friends circle size",
+                label_post_frequency: "Social media posts (per week)",
+                submit_button: "Predict Personality",
+                yes: "Yes",
+                no: "No",
+                result_prefix: "Predicted Personality: ",
+                error_prefix: "Error: "
+            },
+            fr: {
+                title: "Prédiction de personnalité",
+                description: "Découvrez si vous êtes extraverti ou introverti en répondant à quelques questions.",
+                label_time_spent_alone: "Temps passé seul (heures/jour)",
+                label_stage_fear: "Avez-vous le trac sur scène ?",
+                label_social_event_attendance: "Événements sociaux fréquentés (par mois)",
+                label_going_outside: "Jours de sortie (par semaine)",
+                label_drained_after_socializing: "Vous sentez-vous épuisé après avoir socialisé ?",
+                label_friends_circle_size: "Taille du cercle d'amis proches",
+                label_post_frequency: "Publications sur les réseaux sociaux (par semaine)",
+                submit_button: "Prédire la personnalité",
+                yes: "Oui",
+                no: "Non",
+                result_prefix: "Personnalité prédite : ",
+                error_prefix: "Erreur : "
+            },
+            ro: {
+                title: "Predicție de personalitate",
+                description: "Află dacă ești extrovertit sau introvertit răspunzând la câteva întrebări.",
+                label_time_spent_alone: "Timp petrecut singur (ore/zi)",
+                label_stage_fear: "Îți este frică să vorbești în public?",
+                label_social_event_attendance: "Evenimente sociale frecventate (pe lună)",
+                label_going_outside: "Zile de ieșire (pe săptămână)",
+                label_drained_after_socializing: "Te simți epuizat după socializare?",
+                label_friends_circle_size: "Mărimea cercului de prieteni apropiați",
+                label_post_frequency: "Postări pe rețelele sociale (pe săptămână)",
+                submit_button: "Prezice personalitatea",
+                yes: "Da",
+                no: "Nu",
+                result_prefix: "Personalitate prezisă: ",
+                error_prefix: "Eroare: "
+            }
+        };
+
+        const languageSelector = document.getElementById('languageSelector');
         const form = document.getElementById('predictionForm');
         const resultDiv = document.getElementById('result');
+
+        function updateLanguage(lang) {
+            const t = translations[lang];
+            document.getElementById('title').textContent = t.title;
+            document.getElementById('description').textContent = t.description;
+            document.getElementById('label_time_spent_alone').textContent = t.label_time_spent_alone;
+            document.getElementById('label_stage_fear').textContent = t.label_stage_fear;
+            document.getElementById('label_social_event_attendance').textContent = t.label_social_event_attendance;
+            document.getElementById('label_going_outside').textContent = t.label_going_outside;
+            document.getElementById('label_drained_after_socializing').textContent = t.label_drained_after_socializing;
+            document.getElementById('label_friends_circle_size').textContent = t.label_friends_circle_size;
+            document.getElementById('label_post_frequency').textContent = t.label_post_frequency;
+            document.getElementById('submit_button').textContent = t.submit_button;
+
+            // Update select options for stage_fear
+            const stageFearSelect = document.getElementById('stage_fear');
+            stageFearSelect.options[0].text = t.yes;
+            stageFearSelect.options[1].text = t.no;
+
+            // Update select options for drained_after_socializing
+            const drainedSelect = document.getElementById('drained_after_socializing');
+            drainedSelect.options[0].text = t.yes;
+            drainedSelect.options[1].text = t.no;
+
+            // Update HTML lang attribute
+            document.documentElement.lang = lang;
+        }
+
+        // Initialize with English
+        updateLanguage('fr');
+
+        // Language change handler
+        languageSelector.addEventListener('change', (event) => {
+            updateLanguage(event.target.value);
+        });
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -114,7 +221,7 @@
                 Stage_fear: formData.get("stage_fear"),
                 Social_event_attendance: parseFloat(formData.get("social_event_attendance")),
                 Going_outside: parseFloat(formData.get("going_outside")),
-                Drained_after_socializing: formData.get("drained after socializing"),
+                Drained_after_socializing: formData.get("drained_after_socializing"),
                 Friends_circle_size: parseFloat(formData.get("friends_circle_size")),
                 Post_frequency: parseFloat(formData.get("post_frequency"))
             };
@@ -131,10 +238,14 @@
                 }
                 
                 const data = await response.json();
-                resultDiv.textContent = `Predicted Personality: ${data.Personality}`;
+                const lang = languageSelector.value;
+                resultDiv.textContent = `${translations[lang].result_prefix}${data.Personality}`;
+                resultDiv.classList.remove('text-red-600');
                 resultDiv.classList.add('text-emerald-600');
             } catch (error) {
-                resultDiv.textContent = `Error: ${error.message}`;
+                const lang = languageSelector.value;
+                resultDiv.textContent = `${translations[lang].error_prefix}${error.message}`;
+                resultDiv.classList.remove('text-emerald-600');
                 resultDiv.classList.add('text-red-600');
             }
         });
