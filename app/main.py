@@ -8,11 +8,11 @@ import lightgbm as lgb
 
 path = 'models/'
 
-imputer = joblib.load(path + 'imputer.pkl')  # Adjust path as needed
-imputer_cat = joblib.load(path + 'imputer_cat.pkl')  # Adjust path as needed
-cat_encoder = joblib.load(path + 'cat_encoder.pkl')  # Adjust path as needed
-scaler = joblib.load(path + 'scaler.pkl')  # Adjust path as needed
-stackingC = joblib.load(path + 'extroverts.pkl')  # Adjust path as needed
+imputer = joblib.load(path + 'imputer_v1.pkl')  # Adjust path as needed
+imputer_cat = joblib.load(path + 'imputer_cat_v1.pkl')  # Adjust path as needed
+cat_encoder = joblib.load(path + 'cat_encoder_v1.pkl')  # Adjust path as needed
+scaler = joblib.load(path + 'scaler_v1.pkl')  # Adjust path as needed
+stackingC = joblib.load(path + 'extroverts_v1.pkl')  # Adjust path as needed
 
 
 app = FastAPI()
