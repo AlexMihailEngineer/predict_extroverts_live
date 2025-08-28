@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import joblib
 import json
@@ -80,3 +81,5 @@ def predict_personality(input_data: ModelInput):
     personality = 'Extrovert' if pred == 1 else 'Introvert'
 
     return {'Personality': personality}
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")

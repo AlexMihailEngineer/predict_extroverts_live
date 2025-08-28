@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom gradient for button hover */
+        .gradient-hover {
+            transition: all 0.3s ease;
+        }
+        .gradient-hover:hover {
+            background: linear-gradient(to right, #10b981, #059669);
+        }
+        /* Smooth input focus */
+        input:focus, select:focus {
+            outline: none;
+            ring: 2px;
+            ring-color: #10b981;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-6">
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 text-center">
+            Personality Prediction
+        </h1>
+        <p class="text-gray-600 text-center mb-6">
+            Discover if you're an Extrovert or Introvert by answering a few questions.
+        </p>
+        
+        <form id="predictionForm" class="space-y-4">
+            <div>
+                <label for="time_spent_alone" class="block text-sm font-medium text-gray-700">
+                    Time spent alone (hours/day)
+                </label>
+                <input type="number" id="time_spent_alone" name="time_spent_alone" min="0" max="11" required
+                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+            </div>
+            
+            <div>
+                <label for="stage_fear" class="block text-sm font-medium text-gray-700">
+                    Do you have stage fear?
+                </label>
+                <select name="stage_fear" id="stage_fear" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="social_event_attendance" class="block text-sm font-medium text-gray-700">
+                    Social events attended (per month)
+                </label>
+                <input type="number" id="social_event_attendance" name="social_event_attendance" min="0" max="10" required
+                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+            </div>
+
+            <div>
+                <label for="going_outside" class="block text-sm font-medium text-gray-700">
+                    Days going outside (per week)
+                </label>
+                <input type="number" id="going_outside" name="going_outside" min="0" max="7" required
+                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+            </div>
+
+            <div>
+                <label for="drained after socializing" class="block text-sm font-medium text-gray-700">
+                    Feel drained after socializing?
+                </label>
+                <select name="drained after socializing" id="drained after socializing"
+                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="friends_circle_size" class="block text-sm font-medium text-gray-700">
+                    Close friends circle size
+                </label>
+                <input type="number" id="friends_circle_size" name="friends_circle_size" min="0" max="15" required
+                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+            </div>
+            
+            <div>
+                <label for="post_frequency" class="block text-sm font-medium text-gray-700">
+                    Social media posts (per week)
+                </label>
+                <input type="number" id="post_frequency" name="post_frequency" min="0" max="10" required
+                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+            </div>
+            
+            <button type="submit"
+                class="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg gradient-hover">
+                Predict Personality
+            </button>
+        </form>
+        
+        <div id="result" class="mt-6 text-center text-lg font-semibold text-gray-800"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('predictionForm');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const formData = new FormData(form);
+            const inputData = {
+                Time_spent_Alone: parseFloat(formData.get("time_spent_alone")),
+                Stage_fear: formData.get("stage_fear"),
+                Social_event_attendance: parseFloat(formData.get("social_event_attendance")),
+                Going_outside: parseFloat(formData.get("going_outside")),
+                Drained_after_socializing: formData.get("drained after socializing"),
+                Friends_circle_size: parseFloat(formData.get("friends_circle_size")),
+                Post_frequency: parseFloat(formData.get("post_frequency"))
+            };
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(inputData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Prediction failed');
+                }
+                
+                const data = await response.json();
+                resultDiv.textContent = `Predicted Personality: ${data.Personality}`;
+                resultDiv.classList.add('text-emerald-600');
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+                resultDiv.classList.add('text-red-600');
+            }
+        });
+    </script>
+</body>
+</html>
