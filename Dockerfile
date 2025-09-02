@@ -19,7 +19,7 @@ COPY static /app/static
 COPY models/ ./models/
 
 # Expose port
-EXPOSE 8000
+EXPOSE 80
 
 # Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
