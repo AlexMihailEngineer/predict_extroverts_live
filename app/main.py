@@ -9,11 +9,11 @@ import lightgbm as lgb
 
 path = 'models/'
 
-imputer = joblib.load(path + 'imputer_v1.pkl')  # Adjust path as needed
-imputer_cat = joblib.load(path + 'imputer_cat_v1.pkl')  # Adjust path as needed
-cat_encoder = joblib.load(path + 'cat_encoder_v1.pkl')  # Adjust path as needed
-scaler = joblib.load(path + 'scaler_v1.pkl')  # Adjust path as needed
-stackingC = joblib.load(path + 'extroverts_v1.pkl')  # Adjust path as needed
+imputer = joblib.load(path + 'imputer_v1.pkl') 
+imputer_cat = joblib.load(path + 'imputer_cat_v1.pkl') 
+onehot_encoder = joblib.load(path + '1hot_encoder_v1.pkl') 
+scaler = joblib.load(path + 'scaler_v1.pkl') 
+stackingC = joblib.load(path + 'ensemble_v1.pkl')
 
 
 app = FastAPI()
@@ -48,7 +48,7 @@ def predict_personality(input_data: ModelInput):
     # Convert input to DataFrame (single row)
     data = pd.DataFrame([input_data.dict()])
 
-    # Define numerical and categorical columns (based on your training data)
+    # Define numerical and categorical columns
     num_cols = ['Time_spent_Alone', 'Social_event_attendance', 'Going_outside', 'Friends_circle_size', 'Post_frequency']
     cat_cols = ['Stage_fear', 'Drained_after_socializing']
 
@@ -63,10 +63,7 @@ def predict_personality(input_data: ModelInput):
     X_cat_imputed = pd.DataFrame(imputer_cat.transform(X_cat), columns=cat_cols)
 
     # One-hot encode categorical features
-    X_cat_1hot = pd.DataFrame(
-        cat_encoder.transform(X_cat_imputed).toarray(),
-        columns=cat_encoder.get_feature_names_out()
-    )
+    X_cat_1hot = pd.DataFrame(onehot_encoder.transform(X_cat_imputed).toarray(), columns=onehot_encoder.get_feature_names_out(cat_cols))
 
     # Scale numerical features
     X_num_scaled = pd.DataFrame(scaler.transform(X_num_imputed), columns=num_cols)

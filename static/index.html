@@ -56,7 +56,9 @@
                     Time spent alone (hours/day)
                 </label>
                 <input type="number" id="time_spent_alone" name="time_spent_alone" min="0" max="11" required
-                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500"
+                    >
+                <p id="range_time_spent_alone" class="text-xs text-gray-500 mt-1">Range: 0 to 11 hours</p>
             </div>
             
             <div>
@@ -74,7 +76,9 @@
                     Social events attended (per month)
                 </label>
                 <input type="number" id="social_event_attendance" name="social_event_attendance" min="0" max="10" required
-                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500"
+                    >
+                <p id="range_social_event_attendance" class="text-xs text-gray-500 mt-1">Range: 0 to 10 events</p>
             </div>
 
             <div>
@@ -82,7 +86,9 @@
                     Days going outside (per week)
                 </label>
                 <input type="number" id="going_outside" name="going_outside" min="0" max="7" required
-                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500"
+                    >
+                <p id="range_going_outside" class="text-xs text-gray-500 mt-1">Range: 0 to 7 days</p>
             </div>
 
             <div>
@@ -101,7 +107,9 @@
                     Close friends circle size
                 </label>
                 <input type="number" id="friends_circle_size" name="friends_circle_size" min="0" max="15" required
-                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500"
+                    >
+                <p id="range_friends_circle_size" class="text-xs text-gray-500 mt-1">Range: 0 to 15 friends</p>
             </div>
             
             <div>
@@ -109,7 +117,9 @@
                     Social media posts (per week)
                 </label>
                 <input type="number" id="post_frequency" name="post_frequency" min="0" max="10" required
-                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500">
+                    class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-emerald-500"
+                    >
+                <p id="range_post_frequency" class="text-xs text-gray-500 mt-1">Range: 0 to 10 posts</p>
             </div>
             
             <button type="submit" id="submit_button"
@@ -122,6 +132,9 @@
     </div>
 
     <script>
+        // Store the raw prediction result
+        let currentPrediction = null;
+
         const translations = {
             en: {
                 title: "Personality Prediction",
@@ -137,7 +150,14 @@
                 yes: "Yes",
                 no: "No",
                 result_prefix: "Predicted Personality: ",
-                error_prefix: "Error: "
+                error_prefix: "Error: ",
+                range_time_spent_alone: "Range: 0 to 11 hours",
+                range_social_event_attendance: "Range: 0 to 10 events",
+                range_going_outside: "Range: 0 to 7 days",
+                range_friends_circle_size: "Range: 0 to 15 friends",
+                range_post_frequency: "Range: 0 to 10 posts",
+                extrovert: "Extrovert",
+                introvert: "Introvert"
             },
             fr: {
                 title: "Prédiction de personnalité",
@@ -153,7 +173,14 @@
                 yes: "Oui",
                 no: "Non",
                 result_prefix: "Personnalité prédite : ",
-                error_prefix: "Erreur : "
+                error_prefix: "Erreur : ",
+                range_time_spent_alone: "Plage : 0 à 11 heures",
+                range_social_event_attendance: "Plage : 0 à 10 événements",
+                range_going_outside: "Plage : 0 à 7 jours",
+                range_friends_circle_size: "Plage : 0 à 15 amis",
+                range_post_frequency: "Plage : 0 à 10 publications",
+                extrovert: "Extraverti",
+                introvert: "Introverti"
             },
             ro: {
                 title: "Predicție de personalitate",
@@ -169,7 +196,14 @@
                 yes: "Da",
                 no: "Nu",
                 result_prefix: "Personalitate prezisă: ",
-                error_prefix: "Eroare: "
+                error_prefix: "Eroare: ",
+                range_time_spent_alone: "Interval: 0 la 11 ore",
+                range_social_event_attendance: "Interval: 0 la 10 evenimente",
+                range_going_outside: "Interval: 0 la 7 zile",
+                range_friends_circle_size: "Interval: 0 la 15 prieteni",
+                range_post_frequency: "Interval: 0 la 10 postări",
+                extrovert: "Extrovertit",
+                introvert: "Introvertit"
             }
         };
 
@@ -190,6 +224,13 @@
             document.getElementById('label_post_frequency').textContent = t.label_post_frequency;
             document.getElementById('submit_button').textContent = t.submit_button;
 
+            // Update range hints
+            document.getElementById('range_time_spent_alone').textContent = t.range_time_spent_alone;
+            document.getElementById('range_social_event_attendance').textContent = t.range_social_event_attendance;
+            document.getElementById('range_going_outside').textContent = t.range_going_outside;
+            document.getElementById('range_friends_circle_size').textContent = t.range_friends_circle_size;
+            document.getElementById('range_post_frequency').textContent = t.range_post_frequency;
+
             // Update select options for stage_fear
             const stageFearSelect = document.getElementById('stage_fear');
             stageFearSelect.options[0].text = t.yes;
@@ -200,11 +241,23 @@
             drainedSelect.options[0].text = t.yes;
             drainedSelect.options[1].text = t.no;
 
+            // Update result div if a prediction exists
+            if (currentPrediction) {
+                resultDiv.textContent = `${t.result_prefix}${t[currentPrediction.toLowerCase()]}`;
+                resultDiv.classList.remove('text-red-600');
+                resultDiv.classList.add('text-emerald-600');
+            } else if (resultDiv.textContent.startsWith(translations[lang].error_prefix)) {
+                // Preserve error message in the new language
+                resultDiv.textContent = `${t.error_prefix}${resultDiv.textContent.split(': ')[1] || 'Prediction failed'}`;
+                resultDiv.classList.remove('text-emerald-600');
+                resultDiv.classList.add('text-red-600');
+            }
+
             // Update HTML lang attribute
             document.documentElement.lang = lang;
         }
 
-        // Initialize with English
+        // Initialize with French
         updateLanguage('fr');
 
         // Language change handler
@@ -238,11 +291,13 @@
                 }
                 
                 const data = await response.json();
+                currentPrediction = data.Personality; // Store the raw prediction
                 const lang = languageSelector.value;
-                resultDiv.textContent = `${translations[lang].result_prefix}${data.Personality}`;
+                resultDiv.textContent = `${translations[lang].result_prefix}${translations[lang][currentPrediction.toLowerCase()]}`;
                 resultDiv.classList.remove('text-red-600');
                 resultDiv.classList.add('text-emerald-600');
             } catch (error) {
+                currentPrediction = null; // Clear prediction on error
                 const lang = languageSelector.value;
                 resultDiv.textContent = `${translations[lang].error_prefix}${error.message}`;
                 resultDiv.classList.remove('text-emerald-600');
