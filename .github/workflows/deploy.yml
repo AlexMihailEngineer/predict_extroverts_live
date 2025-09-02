@@ -36,23 +36,23 @@ jobs:
           echo "Pushed images: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG and $ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
       - name: Deploy to EC2 via SSM
-          run: |
-            aws ssm send-command \
-              --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
-              --document-name "AWS-RunShellScript" \
-              --parameters '{
-                "commands": [
-                  "echo \"Logging in to ECR...\"",
-                  "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }} || { echo \"ECR login failed\"; exit 1; }",
-                  "echo \"Pulling image...\"",
-                  "docker pull ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest || { echo \"Docker pull failed\"; exit 1; }",
-                  "echo \"Stopping existing container...\"",
-                  "docker stop extroverts_ml_predictor || true",
-                  "docker rm extroverts_ml_predictor || true",
-                  "echo \"Running new container...\"",
-                  "docker run -d --name extroverts_ml_predictor -p 80:80 ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest || { echo \"Docker run failed\"; exit 1; }"
-                ]
-              }' \
-              --region ${{ secrets.AWS_REGION }} \
-              --output text
-            echo "SSM command sent. Check AWS Console for execution status."
+        run: |
+          aws ssm send-command \
+            --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --parameters '{
+              "commands": [
+                "echo \"Logging in to ECR...\"",
+                "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }} || { echo \"ECR login failed\"; exit 1; }",
+                "echo \"Pulling image...\"",
+                "docker pull ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest || { echo \"Docker pull failed\"; exit 1; }",
+                "echo \"Stopping existing container...\"",
+                "docker stop extroverts_ml_predictor || true",
+                "docker rm extroverts_ml_predictor || true",
+                "echo \"Running new container...\"",
+                "docker run -d --name extroverts_ml_predictor -p 80:80 ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest || { echo \"Docker run failed\"; exit 1; }"
+              ]
+            }' \
+            --region ${{ secrets.AWS_REGION }} \
+            --output text
+          echo "SSM command sent. Check AWS Console for execution status."
