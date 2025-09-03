@@ -35,11 +35,13 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           echo "Pushed images: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG and $ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
+
       - name: Deploy to EC2 via SSM
         run: |
           aws ssm send-command \
-            --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
+            --targets "Key=instanceids,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
+            --comment "Deploy extroverts_ml_predictor container to EC2" \
             --parameters '{
               "commands": [
                 "echo \"Logging in to ECR...\"",
@@ -53,6 +55,8 @@ jobs:
                 "docker run -d --name extroverts_ml_predictor -p 80:80 ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest || { echo \"Docker run failed\"; exit 1; }"
               ]
             }' \
+            --timeout-seconds 7200 \
+            --cloud-watch-output-config '{"CloudWatchOutputEnabled": true, "CloudWatchLogGroupName": "/aws/ssm/extroverts"}' \
             --region ${{ secrets.AWS_REGION }} \
             --output text
-          echo "SSM command sent. Check AWS Console for execution status."
+          echo "SSM command sent. Check AWS Console or CloudWatch logs (/aws/ssm/extroverts) for execution status."
