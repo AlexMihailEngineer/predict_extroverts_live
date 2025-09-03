@@ -70,7 +70,7 @@ jobs:
       - name: Deploy to EC2 via SSM
         run: |
           aws ssm send-command \
-            --targets "Key=instanceids,Values=${{ secrets.ECR_REPOSITORY }}" \
+            --targets "Key=instanceids,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy extroverts_ml_predictor container to EC2" \
             --parameters '{
