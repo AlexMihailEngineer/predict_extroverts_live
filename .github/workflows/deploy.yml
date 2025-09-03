@@ -41,11 +41,10 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         run: |
           # Get list of all image digests except the latest
-          IMAGE_DIGESTS=$(aws ecr list-images \
+          IMAGE_DIGESTS=$(aws ecr describe-images \
             --repository-name ${{ secrets.ECR_REPOSITORY }} \
             --region ${{ secrets.AWS_REGION }} \
-            --filter tagStatus=UNTAGGED \
-            --query 'imageIds[*].imageDigest' \
+            --query 'imageDetails[?imageTags[?@!=`latest`]].imageDigest' \
             --output text)
           
           # Delete old images
@@ -56,9 +55,9 @@ jobs:
                 --region ${{ secrets.AWS_REGION }} \
                 --image-ids imageDigest=$DIGEST || { echo "Failed to delete image $DIGEST"; exit 1; }
             done
-            echo "Deleted old untagged images from ECR"
+            echo "Deleted old tagged images (except 'latest') from ECR"
           else
-            echo "No old untagged images to delete"
+            echo "No old tagged images to delete"
           fi
 
       - name: Deploy to EC2 via SSM
@@ -84,4 +83,4 @@ jobs:
             --cloud-watch-output-config '{"CloudWatchOutputEnabled": true, "CloudWatchLogGroupName": "/aws/ssm/extroverts"}' \
             --region ${{ secrets.AWS_REGION }} \
             --output text
-          echo "SSM command sent. Check AWS Console or CloudWatch logs (/aws/ssm/extroverts) for execution status."
+          echo "SSM command sent. Check AWS Console or CloudWatch Logs (/aws/ssm/extroverts) for execution status."
