@@ -46,10 +46,13 @@ The API returns a JSON object with the predicted personality:
     ```
 2.  **Run the application**:
     ```bash
-    uvicorn app.main:app --reload --port 8000
+    uvicorn app.main:app --reload --port 80
     ```
 3.  **Access the application**:
-    Open your browser and navigate to `http://127.0.0.1:8000/`.
+    Open your browser and navigate to `http://127.0.0.1/`.
+
+## OR
+access the application [online](http://51.20.62.183/) 
 
 ## Project Structure
 
