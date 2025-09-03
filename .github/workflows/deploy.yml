@@ -35,6 +35,31 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           echo "Pushed images: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG and $ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
+      - name: Clean up old ECR images
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        run: |
+          # Get list of all image digests except the latest
+          IMAGE_DIGESTS=$(aws ecr list-images \
+            --repository-name ${{ secrets.ECR_REPOSITORY }} \
+            --region ${{ secrets.AWS_REGION }} \
+            --filter tagStatus=UNTAGGED \
+            --query 'imageIds[*].imageDigest' \
+            --output text)
+          
+          # Delete old images
+          if [ ! -z "$IMAGE_DIGESTS" ]; then
+            for DIGEST in $IMAGE_DIGESTS; do
+              aws ecr batch-delete-image \
+                --repository-name ${{ secrets.ECR_REPOSITORY }} \
+                --region ${{ secrets.AWS_REGION }} \
+                --image-ids imageDigest=$DIGEST || { echo "Failed to delete image $DIGEST"; exit 1; }
+            done
+            echo "Deleted old untagged images from ECR"
+          else
+            echo "No old untagged images to delete"
+          fi
 
       - name: Deploy to EC2 via SSM
         run: |
