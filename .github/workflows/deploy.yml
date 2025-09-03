@@ -40,11 +40,18 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         run: |
-          # Get list of all image digests except the latest
+          # Get the digest of the most recent image
+          LATEST_DIGEST=$(aws ecr describe-images \
+            --repository-name ${{ secrets.ECR_REPOSITORY }} \
+            --region ${{ secrets.AWS_REGION }} \
+            --query 'sort_by(imageDetails, &imagePushedAt)[-1].imageDigest' \
+            --output text)
+          
+          # Get list of all image digests except the most recent
           IMAGE_DIGESTS=$(aws ecr describe-images \
             --repository-name ${{ secrets.ECR_REPOSITORY }} \
             --region ${{ secrets.AWS_REGION }} \
-            --query 'imageDetails[?imageTags[?@!=`latest`]].imageDigest' \
+            --query 'imageDetails[?imageDigest!=`'"$LATEST_DIGEST"'`].imageDigest' \
             --output text)
           
           # Delete old images
@@ -53,17 +60,17 @@ jobs:
               aws ecr batch-delete-image \
                 --repository-name ${{ secrets.ECR_REPOSITORY }} \
                 --region ${{ secrets.AWS_REGION }} \
-                --image-ids imageDigest=$DIGEST || { echo "Failed to delete image $DIGEST"; exit 1; }
+                --image-ids=imageDigest=$DIGEST || { echo "Failed to delete image $DIGEST"; exit 1; }
             done
-            echo "Deleted old tagged images (except 'latest') from ECR"
+            echo "Deleted old images, keeping only the most recent image with digest $LATEST_DIGEST"
           else
-            echo "No old tagged images to delete"
+            echo "No old images to delete"
           fi
 
       - name: Deploy to EC2 via SSM
         run: |
           aws ssm send-command \
-            --targets "Key=instanceids,Values=${{ secrets.EC2_INSTANCE_ID }}" \
+            --targets "Key=instanceids,Values=${{ secrets.ECR_REPOSITORY }}" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy extroverts_ml_predictor container to EC2" \
             --parameters '{
