@@ -13,7 +13,7 @@ imputer = joblib.load(path + 'imputer_v1.pkl')
 imputer_cat = joblib.load(path + 'imputer_cat_v1.pkl') 
 onehot_encoder = joblib.load(path + '1hot_encoder_v1.pkl') 
 scaler = joblib.load(path + 'scaler_v1.pkl') 
-stackingC = joblib.load(path + 'ensemble_v1.pkl')
+stackingC = joblib.load(path + 'ensemble_v1.1.pkl')
 
 
 app = FastAPI()
